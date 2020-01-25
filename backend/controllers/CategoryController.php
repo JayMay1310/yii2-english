@@ -8,6 +8,9 @@ use backend\models\CategorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use yii\db\Expression;
+
 /**
  * CategoryController implements the CRUD actions for Category model.
  */
@@ -61,6 +64,25 @@ class CategoryController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
             'dataProvider' => $provider,           
+        ]);
+    }
+
+    public function actionSpeedCategoryLearn($id)
+    {
+
+        $time_from = strtotime('-10 day', time());
+        $delta_from = date('Y-m-d H:i:s', $time_from);
+
+        $category = $this->findModel($id);
+        $query = $category->getWords($id);
+        $words = $query->orderBy(['rand()' => SORT_DESC, new \yii\db\Expression('last_update IS NULL ASC')])
+                                                ->where(['is', 'last_update', new \yii\db\Expression('null')])
+                                                ->orWhere(['<=', 'last_update', $delta_from])
+                                                ->limit(30)
+                                                ->asArray()->all();
+
+        return $this->render('speedlearn', [
+            'query' => $words,           
         ]);
     }
 
@@ -168,6 +190,33 @@ class CategoryController extends Controller
         $this->findModel($id)->delete();
         return $this->redirect(['index']);
     }
+
+    public function actionLearnspeed()
+    {
+        $speed_array=Yii::$app->request->post('speed');
+        $array_word = explode(",", $speed_array);
+        foreach($array_word as $id){
+            $model = Word::findOne((int)$id);//make a typecasting
+            if ($model != null)
+            {
+                /*
+                $category = Category::findOne((int)$model->category_id);
+                if ($category != null)
+                {
+                    $category->last_update = new Expression('NOW()');
+                    $category->save(false); 
+                }
+                */
+
+                $model->last_update = new Expression('NOW()');
+                $model->save(false); 
+            }
+
+       }
+
+       return $this->redirect(['index',]);       
+    }
+
     /**
      * Finds the Category model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -182,5 +231,5 @@ class CategoryController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
+    }    
 }

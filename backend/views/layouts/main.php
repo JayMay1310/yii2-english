@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
+use yii\helpers\Url;
 
 AppAsset::register($this);
 ?>
@@ -46,17 +47,15 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Добавить 1 слово', 'url' => ['/word/create']];
         $menuItems[] = ['label' => 'Статистика', 'url' => ['/word/statistic']];
         $menuItems[] = ['label' => 'Смотреть слова', 'url' => ['/category/index']];
-        $menuItems[] = ['label' => '>20 дней', 'url' => ['/category/rusty']];
-        $menuItems[] = ['label' => '>1 дней < 4', 'url' => ['/category/shortperiod']];
-        $menuItems[] = ['label' => 'Скоростное повторение', 'url' => ['/word/speedlearn']];
-        $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
+        $menuItems[] = ['label' => 'Для спорта', 'url' => ['/word/sport']];
+        //$menuItems[] = '<li>'
+        //    . Html::beginForm(['/site/logout'], 'post')
+        //    . Html::submitButton(
+        //        'Logout (' . Yii::$app->user->identity->username . ')',
+        //        ['class' => 'btn btn-link logout']
+        //    )
+        //    . Html::endForm()
+        //    . '</li>';
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
@@ -65,6 +64,37 @@ AppAsset::register($this);
     NavBar::end();
     ?>
 
+    <div class="col-sm-3 col-md-2 sidebar">
+    <br><br><br><br><br>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/category/rusty'], true) ?>">>20 дней</a>
+                <span class="badge badge-primary badge-pill"><?= Yii::$app->params['count20day']; ?></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/category/shortperiod'], true) ?>">>1 дней < 4</a>
+                <span class="badge badge-primary badge-pill"><?= Yii::$app->params['onedayfor']; ?></span>
+            </li>
+          </ul>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/word/speedlearn'], true) ?>">Скоростное повторение</a>
+                <span class="badge badge-primary badge-pill"><?= Yii::$app->params['speedlearn']; ?></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/dialog/index'], true) ?>">Dialog</a>
+                <span class="badge badge-primary badge-pill">0</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/word/telegram'], true) ?>">Telegram</a>
+                <span class="badge badge-primary badge-pill"><?= Yii::$app->params['telegram']; ?></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="<?= Url::to(['/link/index'], true) ?>">Link</a>
+                <span class="badge badge-primary badge-pill">0</span>
+            </li>
+          </ul>
+    </div>
     <div class="container">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
@@ -75,6 +105,7 @@ AppAsset::register($this);
 </div>
 
 <footer class="footer">
+
     <div class="container">
         <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
 

@@ -36,50 +36,43 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Category */
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Categories', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Dialog', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="category-view">
     <h1><?= Html::encode($this->title) ?></h1>
 </div>
 
-<?=Html::beginForm(['word/learn'],'post');?>
+<?=Html::beginForm(['dialog/learn'],'post');?>
 
-<?=Html::dropDownList('action','',['learn'=>'Выучил',],['class'=>'dropdown',])?>
+<?=Html::dropDownList('action','',['Learn'=>'Выучил', 'Delete'=>'Удалить'],['class'=>'dropdown',])?>
 
 <?=GridView::widget([
     'options' => ['class' => 'table-responsive'],
     'tableOptions' => ['class' => 'table table-condensed'],
     'dataProvider' => $dataProvider,
-    'rowOptions'=>function($model, $key, $index, $column){
-        
+    'rowOptions'=>function($model, $key, $index, $column){   
     },
     'columns' => [
-      [
+       [
          'class' => 'yii\grid\CheckboxColumn',
          'checkboxOptions' => function($model, $key, $index, $widget) {
             return ['value' => $model['id'] ];
           },
         ],
-        ['class' => 'yii\grid\SerialColumn',],
-         
-       'word', 'translation', 'last_update', 'count',
+       'step',
        [
-        'class' => 'yii\grid\ActionColumn',
-        'template' => '{update} {delete}',
-        'buttons' => [
-            'update' => function ($url, $model, $key) {
-                 return Html::a('<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>', ['word/update', 'id' => $model->id]);
-            },
+           'label' => 'Dialog',
+           'format' => 'raw',
+           'value' => function ($model) {
+              $dialog = $model->dialog . '<br>' . $model->translation;
+              return $dialog; 
+           }
 
-            'delete' => function ($url, $model, $key) {
-                return Html::a('<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>', ['word/delete', 'id' => $model->id]);
-            },
-        ],
-    ],
-      ],
+       ], 
+       'last_update', 'count'],
   ]); ?>
 
-<?=Html::submitButton('Выучил', ['class' => 'btn btn-info',]);?>
+<?=Html::submitButton('Применить', ['class' => 'btn btn-info',]);?>
 
 <?= Html::endForm();?> 

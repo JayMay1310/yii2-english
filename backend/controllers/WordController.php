@@ -11,6 +11,9 @@ use common\models\Category;
 use common\models\Word;
 use yii\filters\VerbFilter;
 use yii\data\ArrayDataProvider;
+use yii\data\ActiveDataProvider;
+use yii\db\Query;
+use yii\helpers\Json;
 
 class WordController extends \yii\web\Controller
 {
@@ -19,9 +22,34 @@ class WordController extends \yii\web\Controller
     {
         return $this->render('index');
     }
+
+    public function actionDelete($id)
+    {
+        $model = Word::findOne((int)$id);
+        $model->delete();
+        return $this->redirect(['category/index']);
+    }
+
+    public function actionUpdate($id)
+    {
+        $categories = Category::find()->all();
+        $model = Word::findOne($id);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['update', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+                'categories' => $categories,
+            ]);
+        }
+    }
     
     public function actionCreate($id = null)
     {
+        $request = Yii::$app->request;
+
+        $get = $request->get();
+
         $categories = Category::find()->all();
         $model = new Word();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -81,8 +109,10 @@ class WordController extends \yii\web\Controller
 
             $model->last_update = new Expression('NOW()');
             $model->count = $model->count + 1;
+            $model->send_telegram = false;
             $model->save(false); 
        }
+
        return $this->redirect(['category/view', 'id' => $category_redirect]);     
     }
 
@@ -93,16 +123,17 @@ class WordController extends \yii\web\Controller
 
         foreach($selection as $id){
             $model = Word::findOne((int)$id);//make a typecasting
-            $category = Category::findOne((int)$model->category_id);
-            if ($category != null)
-            {
-                $category->last_update = new Expression('NOW()');
-                $category->save(false); 
-            }
+            //$category = Category::findOne((int)$model->category_id);
+            //if ($category != null)
+            //{
+            //    $category->last_update = new Expression('NOW()');
+            //    $category->save(false); 
+            //}
             
             $model->last_update = new Expression('NOW()');
             $model->save(false); 
        }
+
        return $this->redirect(['category/rusty']);     
     }
 
@@ -138,6 +169,62 @@ class WordController extends \yii\web\Controller
         
         return $this->render('statistic', ['dataProvider' => $provider,]);
     }
+    public function actionSport()
+    {
+        $time_from = strtotime('-10 day', time());
+        $delta_from = date('Y-m-d H:i:s', $time_from);
+
+        $query = Word::find()->orderBy(['rand()' => SORT_DESC, new \yii\db\Expression('last_update IS NULL ASC')])
+                                                ->where(['is', 'last_update', new \yii\db\Expression('null')])
+                                                ->orWhere(['<=', 'last_update', $delta_from])
+                                                ->limit(5)
+                                                ->asArray()->all();
+
+        return $this->render('sport', [
+            'query' => $query,           
+        ]);
+    }
+
+    public function actionLearnsport()
+    {
+        $speed_array=Yii::$app->request->post('speed');
+        $array_word = explode(",", $speed_array);
+        foreach($array_word as $id){
+            $model = Word::findOne((int)$id);//make a typecasting
+            if ($model != null)
+            {
+                $model->last_update = new Expression('NOW()');
+                $model->save(false); 
+            }
+       }
+       return $this->redirect(['word/sport',]);       
+    }
+
+    public function actionTelegramLearn()
+    {
+        $telegram_array=Yii::$app->request->post('telegram');
+        $array_word = explode(",", $telegram_array);
+        foreach($array_word as $id)
+        {
+            $model = Word::findOne((int)$id);//make a typecasting
+            if ($model != null)
+            {
+                $model->last_update = new Expression('NOW()');
+                $model->send_telegram = false;
+                $model->save(false); 
+            }
+       }
+       
+       return $this->redirect(['word/telegram',]);  
+    }
+
+    public function actionTelegram()
+    {
+        $query = Word::find()->where(['=', 'send_telegram', 1])->limit(30)->asArray()->all();
+        return $this->render('telegram', [
+            'query' => $query,           
+        ]);
+    }
 
     public function actionSpeedlearn()
     {
@@ -163,12 +250,14 @@ class WordController extends \yii\web\Controller
             $model = Word::findOne((int)$id);//make a typecasting
             if ($model != null)
             {
+                /*
                 $category = Category::findOne((int)$model->category_id);
                 if ($category != null)
                 {
                     $category->last_update = new Expression('NOW()');
                     $category->save(false); 
                 }
+                */
 
                 $model->last_update = new Expression('NOW()');
                 $model->save(false); 
@@ -178,7 +267,25 @@ class WordController extends \yii\web\Controller
 
        return $this->redirect(['word/speedlearn',]);       
     }
-
+    /** 
+    * Your controller action to fetch the list
+    */
+    public function actionWordList($q = null) {
+        $query = new Query();
+    
+        $query->select(['word', 'translation'])
+            ->from('word')//Таблица тоже называется word
+            ->where('word LIKE "%' . $q .'%"')
+            ->orderBy('word');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out = [];
+        foreach ($data as $d) {
+            $out[] = ['value' => $d['word'] . ' = ' . $d['translation']];
+        }
+        echo Json::encode($out);
+    }
+ 
     public function beforeAction($action)
     {
         if (!parent::beforeAction($action))
@@ -197,5 +304,4 @@ class WordController extends \yii\web\Controller
             return false;
         }
     }
-
 }
