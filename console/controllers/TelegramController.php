@@ -49,12 +49,12 @@ class TelegramController extends Controller
             }
         }
                                                
-        $chatId = '783781261';
+        $chatId = '';
 
-        $bot = new BotApi('970747361:AAHo0ZxfAlAPwoBgE71lEX6YPq-j-6CyAfk');
+        $bot = new BotApi('');
             // Set webhook
 
-        //$bot->setProxy('root:6zd4{k879B8$@195.161.41.150:3128');
+        //$bot->setProxy('');
         $bot->sendMessage($chatId, $messageText, 'HTML');       
     }
 
@@ -90,12 +90,12 @@ class TelegramController extends Controller
             }
         }
                                                
-        $chatId = '783781261';
+        $chatId = '';
 
-        $bot = new BotApi('970747361:AAHo0ZxfAlAPwoBgE71lEX6YPq-j-6CyAfk');
+        $bot = new BotApi('');
         
 
-        //$bot->setProxy('root:6zd4{k879B8$@195.161.41.150:3128');
+        //$bot->setProxy('');
         $bot->sendMessage($chatId, $messageText, 'HTML'); 
     }
 
@@ -131,11 +131,11 @@ class TelegramController extends Controller
         }
 
         $torSocks5Proxy = "socks5://127.0.0.1:9050";
-        $chatId = '783781261';
-        $bot = new BotApi('970747361:AAHo0ZxfAlAPwoBgE71lEX6YPq-j-6CyAfk');
+        $chatId = '';
+        $bot = new BotApi('');
         $bot->setProxy($torSocks5Proxy);
 
-        //$bot->setProxy('root:6zd4{k879B8$@195.161.41.150:3128');
+        //$bot->setProxy('');
         $bot->sendMessage($chatId, $messageText, 'HTML'); 
     }
 
@@ -172,12 +172,12 @@ class TelegramController extends Controller
             }
         }
 
-        $chatId = '783781261';
+        $chatId = '';
 
-        $bot = new BotApi('970747361:AAHo0ZxfAlAPwoBgE71lEX6YPq-j-6CyAfk');
+        $bot = new BotApi('');
             // Set webhook
 
-        //$bot->setProxy('root:6zd4{k879B8$@195.161.41.150:3128');
+        //$bot->setProxy('');
         $bot->sendMessage($chatId, $messageText, 'HTML'); 
 
 
